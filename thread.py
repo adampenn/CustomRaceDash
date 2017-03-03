@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 # System modules
 import tkinter as tk
 #import serial
@@ -14,49 +16,61 @@ queue = Queue()
  
 # This is the thread that reads from the Ardino
 def readFromArduino(app, q):
-  """This is the worker thread function.
-  It processes items in the queue one after
-  another.  These daemon threads go into an
-  infinite loop, and only exit when
-  the main thread ends.
-  """
+  print("*** Read thread running")
   while True:
-    time.sleep(.01)
+    time.sleep(.05)
     #read_serial=ser.readline()
     #s[0] = str(int (ser.readline(),16))
     #print("Reading from Arduino")
     #q.put(s[0])
     #q.put(read_serial)
-    q.put(app.scale.get())
+    RPM = app.scale.get()
+    MPH = 35
+    data = [RPM, MPH]
+    q.put(data)
     q.task_done()
 
 # Update Gauge Values
 def updateGauges(app, q):
+  print("*** Update thread running")
   while True:
-    time.sleep(.01)
-    RPM = q.get()
-    app.RPM["value"] = RPM
+    time.sleep(.05)
+    data = q.get()
+    app.RPM["value"] = data[0]
+    app.MPH["value"] = data[1]
 
 # Declare a class for the GUI
 class SampleApp(tk.Tk):
 
   def __init__(self):
+    # Init
     tk.Tk.__init__(self)
     self.style = ttk.Style()
-    self.style.configure("BW.TLabel", foreground="black", 
-                         background="white")
+    self.style.configure("BW.TLabel", foreground="black")
+
+    # RPM
     self.labelRPM = ttk.Label(text="RPM", style="BW.TLabel")
     self.labelRPM.pack()
     self.RPM = ttk.Progressbar(self, orient="horizontal", length=200,
                                mode="determinate", value=0, maximum=7000)
     self.RPM.pack()
-    self.scale = ttk.Scale(self, from_=0, to=7000, orient="horizontal")
+
+    # MPH
+    self.labelMPH = ttk.Label(text="MPH", style="BW.TLabel")
+    self.labelMPH.pack()
+    self.MPH = ttk.Progressbar(self, orient="horizontal", length=200,
+                               mode="determinate", value=0, maximum=140)
+    self.MPH.pack()
+
+    # Scale for RPM
+    self.scale = ttk.Scale(self, from_=0, to=7000, orient="horizontal", length=200)
     self.scale.pack()
 
 
 #  def get_RPM(self):
 #    self.RPM["value"] = self.scale.get()
 
+print('*** Main thread running')
 
 app = SampleApp()
 
@@ -71,6 +85,5 @@ update.start()
 
 app.mainloop()
 
-print('*** Main thread waiting')
 queue.join()
 print('*** Done')
