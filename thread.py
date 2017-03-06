@@ -17,18 +17,20 @@ queue = Queue()
 # This is the thread that reads from the Ardino
 def readFromArduino(app, q):
   print("*** Read thread running")
+  ser = serial.Serial('/dev/ttyACM0',9600)
+  data = [0]
   while True:
     time.sleep(.05)
-    #read_serial=ser.readline()
-    #s[0] = str(int (ser.readline(),16))
-    #print("Reading from Arduino")
-    #q.put(s[0])
-    #q.put(read_serial)
-    RPM = app.scale.get()
-    MPH = 35
-    data = [RPM, MPH]
-    q.put(data)
-    q.task_done()
+    data[0] = int (ser.readline())
+    #print(s[0])
+    q.put(data[0])
+   
+   
+    #RPM = app.scale.get()
+    #MPH = 35
+    #data = [RPM, MPH]
+    #q.put(data)
+    #q.task_done()
 
 # Update Gauge Values
 def updateGauges(app, q):
@@ -37,7 +39,7 @@ def updateGauges(app, q):
     time.sleep(.05)
     data = q.get()
     app.RPM["value"] = data[0]
-    app.MPH["value"] = data[1]
+    app.MPH["value"] = 35
 
 # Declare a class for the GUI
 class SampleApp(tk.Tk):
