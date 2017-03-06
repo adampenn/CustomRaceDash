@@ -2,7 +2,7 @@
 
 # System modules
 import tkinter as tk
-#import serial
+import serial
 import time
 from tkinter import ttk
 from queue import Queue
