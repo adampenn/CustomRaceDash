@@ -18,11 +18,18 @@ queue = Queue()
 def readFromArduino(app, q):
   print("*** Read thread running")
   ser = serial.Serial('/dev/ttyACM0',9600)
-  data = [0]
+  data = [0,0,0,0,0,0]
   while True:
     time.sleep(.05)
-    data[0] = int (ser.readline())
-    #print(s[0])
+    tmp = (ser.readline()).decode("utf-8")
+    if tmp[0] == 'T':
+      n = len(tmp)
+      RPM = 
+      print(tmp[1:n])
+    if tmp[0] == 'R':
+      n = len(tmp)
+      print(tmp[1:n])
+    data[0] = 3500 #int(temp[0].decode("utf-8"))
     q.put(data)
    
    
@@ -65,7 +72,7 @@ class SampleApp(tk.Tk):
     self.MPH.pack()
 
     # Scale for RPM
-    self.scale = ttk.Scale(self, from_=0, to=7000, orient="horizontal", length=200)
+    self.scale = ttk.Scale(self, from_=0, to=3000, orient="horizontal", length=200)
     self.scale.pack()
 
 
