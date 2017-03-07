@@ -21,23 +21,8 @@ def readFromArduino(app, q):
   data = [0,0,0,0,0,0]
   while True:
     time.sleep(.05)
-    tmp = (ser.readline()).decode("utf-8")
-    if tmp[0] == 'T':
-      n = len(tmp)
-      RPM = 
-      print(tmp[1:n])
-    if tmp[0] == 'R':
-      n = len(tmp)
-      print(tmp[1:n])
-    data[0] = 3500 #int(temp[0].decode("utf-8"))
-    q.put(data)
-   
-   
-    #RPM = app.scale.get()
-    #MPH = 35
-    #data = [RPM, MPH]
-    #q.put(data)
-    #q.task_done()
+    q.put((ser.readline()).decode("utf-8"))
+    q.task_done()
 
 # Update Gauge Values
 def updateGauges(app, q):
@@ -45,8 +30,10 @@ def updateGauges(app, q):
   while True:
     time.sleep(.05)
     data = q.get()
-    app.RPM["value"] = data[0]
-    app.MPH["value"] = 35
+    if tmp[0] == 'T':
+      app.MPH["value"] = int(data[1:len(data)])
+    if tmp[0] == 'R':
+      app.RPM["value"] = int(data[1:len(data)])
 
 # Declare a class for the GUI
 class SampleApp(tk.Tk):
@@ -56,6 +43,13 @@ class SampleApp(tk.Tk):
     tk.Tk.__init__(self)
     self.style = ttk.Style()
     self.style.configure("BW.TLabel", foreground="black")
+
+    # TEMP
+    self.labelTemp = ttk.Label(text="Engine Temp C", style="BW.TLabel")
+    self.labelTemp.pack()
+    self.Temp = ttk.Progressbar(self, orient="horizontal", length=200,
+                               mode="determinate", value=0, maximum=150)
+    self.Temp.pack()
 
     # RPM
     self.labelRPM = ttk.Label(text="RPM", style="BW.TLabel")
@@ -70,10 +64,6 @@ class SampleApp(tk.Tk):
     self.MPH = ttk.Progressbar(self, orient="horizontal", length=200,
                                mode="determinate", value=0, maximum=140)
     self.MPH.pack()
-
-    # Scale for RPM
-    self.scale = ttk.Scale(self, from_=0, to=3000, orient="horizontal", length=200)
-    self.scale.pack()
 
 
 #  def get_RPM(self):
