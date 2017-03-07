@@ -21,7 +21,7 @@ def readFromArduino(app, q):
   data = [0]
   while True:
     time.sleep(.05)
-    data = int (ser.readline())
+    data[0] = int (ser.readline())
     #print(s[0])
     q.put(data)
    
@@ -38,7 +38,7 @@ def updateGauges(app, q):
   while True:
     time.sleep(.05)
     data = q.get()
-    app.RPM["value"] = data
+    app.RPM["value"] = data[0]
     app.MPH["value"] = 35
 
 # Declare a class for the GUI
