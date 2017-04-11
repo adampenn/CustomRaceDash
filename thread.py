@@ -11,13 +11,11 @@ from threading import Thread
 # Set up some global variables
 num_fetch_threads = 1
 queue = Queue()
-#ser = serial.Serial('/dev/ttyACM0',9600)
-#s = [0]
  
 # This is the thread that reads from the Ardino
 def readFromArduino(app, q):
   print("*** Read thread running")
-  ser = serial.Serial('/dev/ttyACM0',9600)
+  ser = serial.Serial('/dev/ttyUSB0',9600)
   data = [0,0,0,0,0,0]
   while True:
     time.sleep(.05)
@@ -30,9 +28,11 @@ def updateGauges(app, q):
   while True:
     time.sleep(.05)
     data = q.get()
-    if tmp[0] == 'T':
+    if data[0] == 'T':
+      app.Temp["value"] = int(data[1:len(data)])
+    if data[0] == 'S':
       app.MPH["value"] = int(data[1:len(data)])
-    if tmp[0] == 'R':
+    if data[0] == 'R':
       app.RPM["value"] = int(data[1:len(data)])
 
 # Declare a class for the GUI
