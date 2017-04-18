@@ -4,30 +4,23 @@
 import tkinter as tk
 import serial
 import time
-import obd
 from tkinter import ttk
 from queue import Queue
 from threading import Thread
-from subprocess import call
 
 # Set up some global variables
 num_fetch_threads = 1
 queue = Queue()
-
-# Init bluetooth connection to ELM237
-call(["sudo", "rfcomm", "connect", "0", "00:1D:A5:00:06:13", "1"])
  
 # This is the thread that reads from the Ardino
-def readELM237(app, q):
+def readFromArduino(app, q):
   print("*** Read thread running")
-  connection = obd.OBD()
-  speed = obd.commands.SPEED
-  rpm = obd.commands.RPM
+  ser = serial.Serial('/dev/ttyUSB0',9600)
+  data = [0,0,0,0,0,0]
   while True:
     time.sleep(.05)
-    if connection.query(speed):
-      q.put((connection.query(speed)).value)
-      q.task_done()
+    q.put((ser.readline()).decode("utf-8"))
+    q.task_done()
 
 # Update Gauge Values
 def updateGauges(app, q):
@@ -35,7 +28,6 @@ def updateGauges(app, q):
   while True:
     time.sleep(.05)
     data = q.get()
-    print(data)
     if data[0] == 'T':
       app.Temp["value"] = int(data[1:len(data)])
     if data[0] == 'S':
