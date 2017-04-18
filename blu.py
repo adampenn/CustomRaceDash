@@ -1,13 +1,19 @@
 #!/usr/bin/python3
 
+import serial
 import obd
 
+#obd.logger.setLevel(obd.logging.DEBUG)
 connection = obd.OBD()
 
 while True:
   speed = obd.commands.SPEED
+  RPM = obd.commands.RPM
 
-  response = connection.query(speed)
+  if(connection.query(speed)):
+    sval = connection.query(speed)
+    print(sval.value)
+  if(connection.query(RPM)):
+    rval = connection.query(RPM)
+    print(rval.value)
 
-  print(response.value) # returns unit-bearing values thanks to Pint
-  print(response.value.to("mph")) # user-friendly unit conversions
