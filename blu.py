@@ -12,8 +12,6 @@ while True:
 
   if(connection.query(speed)):
     sval = connection.query(speed)
-    print(sval.value)
-  if(connection.query(RPM)):
-    rval = connection.query(RPM)
-    print(rval.value)
+    value = "S" + str(sval.value.magnitude)
+    print(value)
 

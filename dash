@@ -8,25 +8,28 @@ import obd
 from tkinter import ttk
 from queue import Queue
 from threading import Thread
-from subprocess import call
 
 # Set up some global variables
 num_fetch_threads = 1
 queue = Queue()
-
-# Init bluetooth connection to ELM237
-call(["sudo", "rfcomm", "connect", "0", "00:1D:A5:00:06:13", "1"])
  
 # This is the thread that reads from the Ardino
-def readELM237(app, q):
+def readFromArduino(app, q):
   print("*** Read thread running")
   connection = obd.OBD()
   speed = obd.commands.SPEED
   rpm = obd.commands.RPM
+  eng_temp = obd.commands.COOLANT_TEMP
   while True:
-    time.sleep(.05)
-    if connection.query(speed):
-      q.put((connection.query(speed)).value)
+    if(connection.query(speed)):
+      sval = connection.query(speed)
+      sval = str(sval.value.magnitude)
+      rval = connection.query(rpm)
+      rval = str(rval.value.magnitude)
+      eval = connection.query(eng_temp)
+      eval = str(eval.value.magnitude)
+      data = [sval, rval, eval]
+      q.put(data)
       q.task_done()
 
 # Update Gauge Values
@@ -35,13 +38,9 @@ def updateGauges(app, q):
   while True:
     time.sleep(.05)
     data = q.get()
-    print(data)
-    if data[0] == 'T':
-      app.Temp["value"] = int(data[1:len(data)])
-    if data[0] == 'S':
-      app.MPH["value"] = int(data[1:len(data)])
-    if data[0] == 'R':
-      app.RPM["value"] = int(data[1:len(data)])
+    app.Temp["value"] = float(data[2])
+    app.MPH["value"] = float(data[0])
+    app.RPM["value"] = float(data[1])
 
 # Declare a class for the GUI
 class SampleApp(tk.Tk):
