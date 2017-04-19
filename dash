@@ -12,7 +12,15 @@ from threading import Thread
 # Set up some global variables
 num_fetch_threads = 1
 queue = Queue()
- 
+
+# This gets the data from the ELM237 BT module
+def readFromELM(command):
+  fromELM = connection.query(command)
+  #todo: figure out how to differ commands and convert speed to mph
+  printf(command)
+  magnitude = str(fromELM.value.magnitude)
+  return magnitude;
+
 # This is the thread that reads from the Ardino
 def readFromArduino(app, q):
   print("*** Read thread running")
@@ -20,15 +28,17 @@ def readFromArduino(app, q):
   speed = obd.commands.SPEED
   rpm = obd.commands.RPM
   eng_temp = obd.commands.COOLANT_TEMP
+  fuel_level = obd.commands.FUEL_LEVEL
+  intake_temp = obd.commands.INTAKE_TEMP
   while True:
     if(connection.query(speed)):
-      sval = connection.query(speed)
-      sval = str(sval.value.magnitude)
-      rval = connection.query(rpm)
-      rval = str(rval.value.magnitude)
-      eval = connection.query(eng_temp)
-      eval = str(eval.value.magnitude)
-      data = [sval, rval, eval]
+      data = [
+        readFromELM(speed),       #data[0]
+        readFromELM(rpm),         #data[1]
+        readFromELM(eng_temp),    #data[2]
+        readFromELM(fuel_level),  #etc.
+        readFromELM(intake_temp)
+      ]
       q.put(data)
       q.task_done()
 
@@ -38,9 +48,11 @@ def updateGauges(app, q):
   while True:
     time.sleep(.05)
     data = q.get()
-    app.Temp["value"] = float(data[2])
     app.MPH["value"] = float(data[0])
+    app.labelTemp["value"] = "Engine Temp " + data[2] + "C"
     app.RPM["value"] = float(data[1])
+    app.Temp["value"] = float(data[2])
+    app.labelTemp["value"] = "Engine Temp " + data[2] + "C"
 
 # Declare a class for the GUI
 class SampleApp(tk.Tk):
@@ -55,7 +67,7 @@ class SampleApp(tk.Tk):
     self.labelTemp = ttk.Label(text="Engine Temp C", style="BW.TLabel")
     self.labelTemp.pack()
     self.Temp = ttk.Progressbar(self, orient="horizontal", length=200,
-                               mode="determinate", value=0, maximum=150)
+                               mode="determinate", value=0, maximum=250)
     self.Temp.pack()
 
     # RPM
@@ -71,6 +83,13 @@ class SampleApp(tk.Tk):
     self.MPH = ttk.Progressbar(self, orient="horizontal", length=200,
                                mode="determinate", value=0, maximum=140)
     self.MPH.pack()
+
+    # Oil Pressure
+    self.labelOilPressure = ttk.Label(text="Oil Pressure", style="BW.TLabel")
+    self.labelOilPressure.pack()
+    self.OilPressure = ttk.Progressbar(self, orient="horizontal", length=200,
+                               mode="determinate", value=0, maximum=250)
+    self.OilPressure.pack()
 
 
 #  def get_RPM(self):
