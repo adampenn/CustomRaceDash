@@ -1,0 +1,88 @@
+#!/usr/bin/python3
+ 
+import tkinter as tk
+from tkinter import *
+from tkinter.ttk import *
+from queue import Queue
+from threading import Thread
+import sys
+import serial
+import obd
+
+# Set up some global variables
+num_fetch_threads = 1 
+queue = Queue()
+
+# This gets the data from the ELM237 BT module
+def readFromELM(command):
+  fromELM = connection.query(command)
+  #todo: figure out how to differ commands and convert speed to mph
+  printf(command)
+  magnitude = str(fromELM.value.magnitude)
+  return magnitude;
+
+# This is the thread that reads from the Ardino
+def readData(app, q): 
+  print("*** Read thread running")
+  connection = obd.OBD()
+  speed = obd.commands.SPEED
+  rpm = obd.commands.RPM
+  eng_temp = obd.commands.COOLANT_TEMP
+  fuel_level = obd.commands.FUEL_LEVEL
+  intake_temp = obd.commands.INTAKE_TEMP
+  while True:
+    if(connection.query(speed)):
+      data = [ 
+        readFromELM(speed),       #data[0]
+        readFromELM(rpm),         #data[1]
+        readFromELM(eng_temp),    #data[2]
+        readFromELM(fuel_level),  #etc.
+        readFromELM(intake_temp)
+      ]   
+      q.put(data)
+      q.task_done()
+
+# Update Gauge Values
+def updateGauges(app, q): 
+  print("*** Update thread running")
+  while True:
+    time.sleep(.05)
+    data = q.get()
+    app.MPH["value"] = float(data[0])
+    app.labelTemp["value"] = "Engine Temp " + data[2] + "C" 
+    app.RPM["value"] = float(data[1])
+    app.Temp["value"] = float(data[2])
+    app.labelTemp["value"] = "Engine Temp " + data[2] + "C" 
+
+# Dash GUI
+class Dash(tk.Tk):
+  def __init__(self):
+    tk.Tk.__init__(self)
+    notebook = Notebook(self)
+    
+    notebook.add(Frame(width=400, height=300),text="TAB 1")
+    notebook.add(Frame(width=400, height=300),text="TAB 2")
+    notebook.add(Frame(width=400, height=300),text="TAB 3")
+    notebook.bind_all("<<NotebookTabChanged>>", self.tabChangedEvent)
+    notebook.pack()
+    
+    self.label = Label(self,text="")
+    self.label.pack()
+    
+  def tabChangedEvent(self,event):
+    self.label.configure(text=event.widget.tab(event.widget.index("current"),"text"))
+    
+def main():
+  dash = Dash()
+  # Set up some threads
+  read = Thread(target=readData, args=(dash, queue,))
+  read.setDaemon(True)
+  read.start()
+
+  update = Thread(target=updateGauges, args=(dash, queue,))
+  update.setDaemon(True)
+  update.start()
+
+  dash.mainloop()
+  
+main()

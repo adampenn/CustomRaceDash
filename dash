@@ -22,7 +22,7 @@ def readFromELM(command):
   return magnitude;
 
 # This is the thread that reads from the Ardino
-def readFromArduino(app, q):
+def readData(app, q):
   print("*** Read thread running")
   connection = obd.OBD()
   speed = obd.commands.SPEED
@@ -55,52 +55,58 @@ def updateGauges(app, q):
     app.labelTemp["value"] = "Engine Temp " + data[2] + "C"
 
 # Declare a class for the GUI
-class SampleApp(tk.Tk):
+class Dash(tk.Tk):
 
   def __init__(self):
     # Init
     tk.Tk.__init__(self)
-    self.style = ttk.Style()
-    self.style.configure("BW.TLabel", foreground="black")
+    style = ttk.Style()
+    style.configure("BW.TLabel", foreground="black")
+    self.geometry('800x480')
+
+    # Set up the different screens
+    notebook = ttk.Notebook(self)
+    screen1 = ttk.Frame(notebook)
+    screen2 = ttk.Frame(notebook)
+    notebook.add(screen1, text='Screen 1')
+    notebook.add(screen2, text='Screen 2')
+    notebook.pack()
 
     # TEMP
-    self.labelTemp = ttk.Label(text="Engine Temp C", style="BW.TLabel")
-    self.labelTemp.pack()
-    self.Temp = ttk.Progressbar(self, orient="horizontal", length=200,
+    labelTemp = ttk.Label(screen1, text="Engine Temp C", style="BW.TLabel")
+    labelTemp.pack()
+    Temp = ttk.Progressbar(screen1, orient="horizontal", length=200,
                                mode="determinate", value=0, maximum=250)
-    self.Temp.pack()
+    Temp.pack()
 
     # RPM
-    self.labelRPM = ttk.Label(text="RPM", style="BW.TLabel")
-    self.labelRPM.pack()
-    self.RPM = ttk.Progressbar(self, orient="horizontal", length=200,
+    labelRPM = ttk.Label(screen1, text="RPM", style="BW.TLabel")
+    labelRPM.pack()
+    RPM = ttk.Progressbar(screen1, orient="horizontal", length=200,
                                mode="determinate", value=0, maximum=7000)
-    self.RPM.pack()
+    RPM.pack()
 
     # MPH
-    self.labelMPH = ttk.Label(text="MPH", style="BW.TLabel")
-    self.labelMPH.pack()
-    self.MPH = ttk.Progressbar(self, orient="horizontal", length=200,
+    labelMPH = ttk.Label(screen2, text="MPH", style="BW.TLabel")
+    labelMPH.pack()
+    MPH = ttk.Progressbar(screen2, orient="horizontal", length=200,
                                mode="determinate", value=0, maximum=140)
-    self.MPH.pack()
+    MPH.pack()
 
     # Oil Pressure
-    self.labelOilPressure = ttk.Label(text="Oil Pressure", style="BW.TLabel")
-    self.labelOilPressure.pack()
-    self.OilPressure = ttk.Progressbar(self, orient="horizontal", length=200,
+    labelOilPressure = ttk.Label(screen2, text="Oil Pressure", style="BW.TLabel")
+    labelOilPressure.pack()
+    OilPressure = ttk.Progressbar(screen2, orient="horizontal", length=200,
                                mode="determinate", value=0, maximum=250)
-    self.OilPressure.pack()
+    OilPressure.pack()
 
-
-#  def get_RPM(self):
-#    self.RPM["value"] = self.scale.get()
 
 print('*** Main thread running')
 
-app = SampleApp()
+app = Dash()
 
 # Set up some threads
-read = Thread(target=readFromArduino, args=(app, queue,))
+read = Thread(target=readData, args=(app, queue,))
 read.setDaemon(True)
 read.start()
 
