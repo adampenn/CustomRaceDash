@@ -1,5 +1,0 @@
-#!/usr/bin/python3
-from subprocess import call
-
-call(["sudo", "rfcomm", "connect", "0", "00:1D:A5:00:06:13", "1"])
-
