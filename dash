@@ -3,6 +3,7 @@
 # System modules
 import tkinter as tk
 import serial
+import socket
 import time
 import obd
 from tkinter import ttk
@@ -12,6 +13,27 @@ from threading import Thread
 # Set up some global variables
 num_fetch_threads = 1
 queue = Queue()
+
+# Gets data from dataMaker app
+def readFromDataMaker(app, q)
+  print("*** Read thread running")
+  hostMACAddress = 'b8:27:eb:2d:17:5a'
+  #hostMACAddress = 'b8:27:eb:7b:60:24'
+  port = 3
+  backlog = 1
+  size = 1024
+  s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+  s.bind((hostMACAddress,port))
+  s.listen(backlog)
+  client, address = s.accept()
+  print('Connected by', address)
+  while 1:
+    data = client.recv(size)
+    if data:
+      data = (data.decode("utf-8")).split()
+      q.put(data)
+      q.task_done()
+      #client.send(data)
 
 # This gets the data from the ELM237 BT module
 def readFromELM(command):
@@ -126,7 +148,7 @@ print('*** Main thread running')
 app = Dash()
 
 # Set up some threads
-read = Thread(target=readData, args=(app, queue,))
+read = Thread(target=readFromDataMaker, args=(app, queue,))
 read.setDaemon(True)
 read.start()
 
