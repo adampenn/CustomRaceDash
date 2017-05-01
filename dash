@@ -79,6 +79,10 @@ def updateGauges(app, q):
 
     app.RPM["value"] = float(data[1])
     app.labelTemp["text"] = data[1] + "RPM"
+    if data[1] > 5500:
+      app.RPM["style"] = "RPMhigh"
+    else:
+      app.RPM["style"] = "RPMreg"
 
     app.Temp["value"] = float(data[2])
     app.labelTemp["text"] = "Engine Temp " + data[2] + "C"
@@ -96,6 +100,8 @@ class Dash(tk.Tk):
     # Init
     tk.Tk.__init__(self)
     style = ttk.Style()
+    style.configure("RPMhigh", forground='red', thickness=100)
+    style.configure("RPMreg", forground='blue', thickness=100)
     style.configure("BW.TLabel", foreground="black")
     self.geometry('800x480')
 
@@ -117,7 +123,7 @@ class Dash(tk.Tk):
     # RPM
     self.labelRPM = ttk.Label(screen1, text="RPM", style="BW.TLabel")
     self.labelRPM.pack()
-    self.RPM = ttk.Progressbar(screen1, orient="horizontal", length=800,
+    self.RPM = ttk.Progressbar(screen1, orient="vertical", length=800,
                                mode="determinate", value=0, maximum=7000)
     self.RPM.pack()
 
