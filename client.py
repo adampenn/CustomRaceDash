@@ -1,18 +1,14 @@
 #!/usr/bin/python3
 
-import socket
+import bluetooth
 
-serverAddress = 'b8:27:eb:7b:60:24'
-
+serverMACAddress = 'b8:27:eb:7b:60:24'
 port = 3
-
-s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-s.connect((serverAddress,port))
-
-while True:
-  text = input();
-  if text == "quit":
+s = bluetooth.BluetoothSocket(bluetooth.RFCOMM)
+s.connect((serverMACAddress, port))
+while 1:
+    text = raw_input() # Note change to the old (Python 2) raw_input
+    if text == "quit":
     break
-  s.send(bytes(text, 'UTF-8'))
-s.close()
-
+    s.send(text)
+sock.close()
