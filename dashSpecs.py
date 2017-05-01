@@ -1,0 +1,6 @@
+#!/usr/bin/python3
+
+RPM_MAX = 9000
+RPM_RED_LINE = 8500
+RPM_WARNING = 7000
+
