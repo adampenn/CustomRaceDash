@@ -15,13 +15,13 @@ num_fetch_threads = 1
 queue = Queue()
 
 # Gets data from dataMaker app
-def readFromDataMaker(app, q)
+def readFromDataMaker(app, q):
   print("*** Read thread running")
   hostMACAddress = 'b8:27:eb:2d:17:5a'
   #hostMACAddress = 'b8:27:eb:7b:60:24'
   port = 3
   backlog = 1
-  size = 1024
+  size = 128
   s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
   s.bind((hostMACAddress,port))
   s.listen(backlog)
@@ -83,11 +83,11 @@ def updateGauges(app, q):
     app.Temp["value"] = float(data[2])
     app.labelTemp["text"] = "Engine Temp " + data[2] + "C"
 
-    #app.fuelLevel["value"] = float(data[3])
-    #app.labelFuelLevel["text"] = "Fuel Level " + data[3] + "%"
+    app.fuelLevel["value"] = float(data[3])
+    app.labelFuelLevel["text"] = "Fuel Level " + data[3] + "%"
 
-    app.intakeTemp["value"] = float(data[3])
-    app.labelIntakeTemp["text"] = "Intake Temp " + data[3] + "C"
+    app.intakeTemp["value"] = float(data[4])
+    app.labelIntakeTemp["text"] = "Intake Temp " + data[4] + "C"
 
 # Declare a class for the GUI
 class Dash(tk.Tk):
