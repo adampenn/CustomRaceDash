@@ -24,6 +24,7 @@ def getData(app, q):
   s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
   s.connect((serverMACAddress,port))
   while True:
+    time.sleep(1)
     data = [
       int(app.MPH.get()),        #data[0]
       int(app.RPM.get()),        #data[1]
@@ -60,7 +61,7 @@ class Dash(tk.Tk):
     # RPM
     self.labelRPM = ttk.Label(screen1, text="RPM", style="BW.TLabel")
     self.labelRPM.pack()
-    self.RPM = ttk.Scale(screen1, from_=0, to=700, length=800, orient="horizontal")
+    self.RPM = ttk.Scale(screen1, from_=0, to=8000, length=800, orient="horizontal")
     self.RPM.pack()
 
     # MPH
