@@ -1,0 +1,94 @@
+#!/usr/bin/python3
+
+# System modules
+import tkinter as tk
+import serial
+import time
+import obd
+import socket
+from tkinter import ttk
+from queue import Queue
+from threading import Thread
+
+# Set up some global variables
+num_fetch_threads = 1
+queue = Queue()
+
+# This is the thread that reads from the Ardino
+def getData(app, q):
+  print("*** Read thread running")
+  serverMACAddress = 'b8:27:eb:2d:17:5a'
+  #serverMACAddress = 'b8:27:eb:7b:60:24'
+  port = 3
+  s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+  s.connect((serverMACAddress,port))
+  while True:
+    data = [
+      app.MPH.get(),        #data[0]
+      app.RPM.get(),        #data[1]
+      app.Temp.get(),       #data[2]
+      app.fuelLevel.get(),  #etc.
+      app.intakeTemp.get()
+    ]
+  s.send(bytes(data, 'UTF-8'))
+
+# Declare a class for the GUI
+class Dash(tk.Tk):
+
+  def __init__(self):
+    # Init
+    tk.Tk.__init__(self)
+    style = ttk.Style()
+    style.configure("BW.TLabel", foreground="black")
+    self.geometry('800x480')
+
+    # Set up the different screens
+    notebook = ttk.Notebook(self)
+    screen1 = ttk.Frame(notebook)
+    notebook.add(screen1, text='Screen 1')
+    notebook.pack()
+
+    # TEMP
+    self.labelTemp = ttk.Label(screen1, text="Engine Temp C", style="BW.TLabel")
+    self.labelTemp.pack()
+    self.Temp = ttk.Scale(screen1, from_=0, to=250, length=800, orient="horizontal")
+    self.Temp.pack()
+
+    # RPM
+    self.labelRPM = ttk.Label(screen1, text="RPM", style="BW.TLabel")
+    self.labelRPM.pack()
+    self.RPM = ttk.Scale(screen1, from_=0, to=700, length=800, orient="horizontal")
+    self.RPM.pack()
+
+    # MPH
+    self.labelMPH = ttk.Label(screen1, text="MPH", style="BW.TLabel")
+    self.labelMPH.pack()
+    self.MPH = ttk.Scale(screen1, from_=0, to=120, length=800, orient="horizontal")
+    self.MPH.pack()
+
+    # Fuel Level
+    self.labelFuelLevel = ttk.Label(screen1, text="Fuel Level", style="BW.TLabel")
+    self.labelFuelLevel.pack()
+    self.fuelLevel = ttk.Scale(screen1, from_=0, to=100, length=800, orient="horizontal")
+    self.fuelLevel.pack()
+
+    # Intake Temp
+    self.labelIntakeTemp = ttk.Label(screen1, text="Intake Temp", style="BW.TLabel")
+    self.labelIntakeTemp.pack()
+    self.intakeTemp = ttk.Scale(screen1, from_=0, to=200, length=800, orient="horizontal")
+    self.intakeTemp.pack()
+
+
+print('*** Main thread running')
+
+app = Dash()
+
+# Set up some threads
+getData = Thread(target=getData, args=(app, queue,))
+getData.setDaemon(True)
+getData.start()
+
+app.mainloop()
+
+queue.join()
+print('*** Done')
