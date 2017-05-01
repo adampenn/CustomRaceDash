@@ -100,8 +100,9 @@ class Dash(tk.Tk):
     # Init
     tk.Tk.__init__(self)
     style = ttk.Style()
-    style.configure("RPMhigh", forground='red', thickness=100)
-    style.configure("RPMreg", forground='blue', thickness=100)
+    #style.configure("RPMhigh", forground='red', thickness=100)
+    style.configure("TProgressbar", background='red', forground='red', thickness=100)
+    #style.configure("TProgressbar", forground='blue', thickness=100)
     style.configure("BW.TLabel", foreground="black")
     self.geometry('800x480')
 
@@ -123,7 +124,7 @@ class Dash(tk.Tk):
     # RPM
     self.labelRPM = ttk.Label(screen1, text="RPM", style="BW.TLabel")
     self.labelRPM.pack()
-    self.RPM = ttk.Progressbar(screen1, orient="vertical", style="RPMreg",
+    self.RPM = ttk.Progressbar(screen1, orient="vertical", style="TProgressbar",
                                length=800, mode="determinate", value=0,
 			       maximum=7000)
     self.RPM.pack()
