@@ -2,8 +2,8 @@
 
 import socket
 
-#hostMACAddress = 'b8:27:eb:2d:17:5a'
-hostMACAddress = 'b8:27:eb:7b:60:24'
+hostMACAddress = 'b8:27:eb:2d:17:5a'
+#hostMACAddress = 'b8:27:eb:7b:60:24'
 port = 3 # 3 is an arbitrary choice. However, it must match the port used by the client.
 backlog = 1
 size = 1024
