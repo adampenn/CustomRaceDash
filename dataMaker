@@ -32,13 +32,7 @@ def getData(app, q):
       app.intakeTemp.get()
     ]
     data_string = pickle.dumps(data)
-    s.send(data)
-
-    data = s.recv(4096)
-    data_arr = pickle.dumps(arr)
-    s.close()
-
-
+    s.send(bytes(data))
 
 # Declare a class for the GUI
 class Dash(tk.Tk):

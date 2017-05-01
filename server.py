@@ -16,8 +16,9 @@ try:
     while 1:
         data = client.recv(size)
         if data:
-            print(data)
-            client.send(data)
+            data_arr = pickle.dumps(data)
+            print(data_arr)
+            client.send(data_arr)
 except:	
     print("Closing socket")	
     client.close()
