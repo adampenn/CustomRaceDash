@@ -6,6 +6,7 @@ import serial
 import time
 import obd
 import socket
+import pickle
 from tkinter import ttk
 from queue import Queue
 from threading import Thread
@@ -16,7 +17,7 @@ queue = Queue()
 
 # This is the thread that reads from the Ardino
 def getData(app, q):
-  print("*** Read thread running")
+  print("*** Get thread running")
   serverMACAddress = 'b8:27:eb:2d:17:5a'
   #serverMACAddress = 'b8:27:eb:7b:60:24'
   port = 3
@@ -30,7 +31,14 @@ def getData(app, q):
       app.fuelLevel.get(),  #etc.
       app.intakeTemp.get()
     ]
-  s.send(bytes(data, 'UTF-8'))
+    data_string = pickle.dumps(data)
+    s.send(data)
+
+    data = s.recv(4096)
+    data_arr = pickle.dumps(arr)
+    s.close()
+
+
 
 # Declare a class for the GUI
 class Dash(tk.Tk):
