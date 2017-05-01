@@ -15,9 +15,11 @@ queue = Queue()
 
 # This gets the data from the ELM237 BT module
 def readFromELM(command):
+  connection = obd.OBD()
   fromELM = connection.query(command)
   #todo: figure out how to differ commands and convert speed to mph
-  printf(command)
+  #print(command)
+  print(fromELM.value.magnitude)
   magnitude = str(fromELM.value.magnitude)
   return magnitude;
 
@@ -31,12 +33,13 @@ def readData(app, q):
   fuel_level = obd.commands.FUEL_LEVEL
   intake_temp = obd.commands.INTAKE_TEMP
   while True:
+    time.sleep(.05)
     if(connection.query(speed)):
       data = [
         readFromELM(speed),       #data[0]
         readFromELM(rpm),         #data[1]
         readFromELM(eng_temp),    #data[2]
-        readFromELM(fuel_level),  #etc.
+        #readFromELM(fuel_level),  #etc.
         readFromELM(intake_temp)
       ]
       q.put(data)
@@ -50,19 +53,19 @@ def updateGauges(app, q):
     data = q.get()
 
     app.MPH["value"] = float(data[0])
-    app.labelMPH["value"] = data[0] + " MPH"
+    app.labelMPH["text"] = data[0] + " MPH"
 
     app.RPM["value"] = float(data[1])
-    app.labelTemp["value"] = data[1] + "RPM"
+    app.labelTemp["text"] = data[1] + "RPM"
 
     app.Temp["value"] = float(data[2])
-    app.labelTemp["value"] = "Engine Temp " + data[2] + "C"
+    app.labelTemp["text"] = "Engine Temp " + data[2] + "C"
 
-    app.fuelLevel["value"] = float(data[3])
-    app.labelFuelLevel["value"] = "Fuel Level " + data[3] + "%"
+    #app.fuelLevel["value"] = float(data[3])
+    #app.labelFuelLevel["text"] = "Fuel Level " + data[3] + "%"
 
-    app.intakeTemp["value"] = float(data[4])
-    app.labelIntakeTemp["value"] = "Intake Temp " + data[4] + "C"
+    app.intakeTemp["value"] = float(data[3])
+    app.labelIntakeTemp["text"] = "Intake Temp " + data[3] + "C"
 
 # Declare a class for the GUI
 class Dash(tk.Tk):
@@ -83,39 +86,39 @@ class Dash(tk.Tk):
     notebook.pack()
 
     # TEMP
-    labelTemp = ttk.Label(screen1, text="Engine Temp C", style="BW.TLabel")
-    labelTemp.pack()
-    Temp = ttk.Progressbar(screen1, orient="horizontal", length=800,
+    self.labelTemp = ttk.Label(screen1, text="Engine Temp C", style="BW.TLabel")
+    self.labelTemp.pack()
+    self.Temp = ttk.Progressbar(screen1, orient="horizontal", length=800,
                                mode="determinate", value=0, maximum=250)
-    Temp.pack()
+    self.Temp.pack()
 
     # RPM
-    labelRPM = ttk.Label(screen1, text="RPM", style="BW.TLabel")
-    labelRPM.pack()
-    RPM = ttk.Progressbar(screen1, orient="horizontal", length=800,
+    self.labelRPM = ttk.Label(screen1, text="RPM", style="BW.TLabel")
+    self.labelRPM.pack()
+    self.RPM = ttk.Progressbar(screen1, orient="horizontal", length=800,
                                mode="determinate", value=0, maximum=7000)
-    RPM.pack()
+    self.RPM.pack()
 
     # MPH
-    labelMPH = ttk.Label(screen2, text="MPH", style="BW.TLabel")
-    labelMPH.pack()
-    MPH = ttk.Progressbar(screen2, orient="horizontal", length=800,
+    self.labelMPH = ttk.Label(screen2, text="MPH", style="BW.TLabel")
+    self.labelMPH.pack()
+    self.MPH = ttk.Progressbar(screen2, orient="horizontal", length=800,
                                mode="determinate", value=0, maximum=120)
-    MPH.pack()
+    self.MPH.pack()
 
     # Fuel Level
-    labelFuelLevel = ttk.Label(screen2, text="Fuel Level", style="BW.TLabel")
-    labelFuelLevel.pack()
-    fuelLevel = ttk.Progressbar(screen2, orient="horizontal", length=800,
+    self.labelFuelLevel = ttk.Label(screen2, text="Fuel Level", style="BW.TLabel")
+    self.labelFuelLevel.pack()
+    self.fuelLevel = ttk.Progressbar(screen2, orient="horizontal", length=800,
                                mode="determinate", value=0, maximum=100)
-    fuelLevel.pack()
+    self.fuelLevel.pack()
 
     # Intake Temp
-    labelIntakeTemp = ttk.Label(screen2, text="Intake Temp", style="BW.TLabel")
-    labelIntakeTemp.pack()
-    intakeTemp = ttk.Progressbar(screen2, orient="horizontal", length=800,
+    self.labelIntakeTemp = ttk.Label(screen2, text="Intake Temp", style="BW.TLabel")
+    self.labelIntakeTemp.pack()
+    self.intakeTemp = ttk.Progressbar(screen2, orient="horizontal", length=800,
                                mode="determinate", value=0, maximum=200)
-    intakeTemp.pack()
+    self.intakeTemp.pack()
 
 
 print('*** Main thread running')
