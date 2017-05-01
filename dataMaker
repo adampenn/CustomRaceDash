@@ -31,8 +31,9 @@ def getData(app, q):
       int(app.fuelLevel.get()),  #etc.
       int(app.intakeTemp.get())
     ]
-    data_string = pickle.dumps(data)
-    s.send(bytes(data))
+    data = ' '.join(str(e) for e in data)
+    #data_string = pickle.dumps(data)
+    s.send(bytes(data, 'UTF-8'))
 
 # Declare a class for the GUI
 class Dash(tk.Tk):
