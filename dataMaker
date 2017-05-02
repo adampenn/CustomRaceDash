@@ -56,7 +56,7 @@ class Dash(tk.Tk):
     # TEMP
     self.labelTemp = ttk.Label(screen1, text="Engine Temp C", style="BW.TLabel")
     self.labelTemp.pack()
-    self.Temp = ttk.Scale(screen1, from_=0, to=FUEL_MAX, length=800, orient="horizontal")
+    self.Temp = ttk.Scale(screen1, from_=0, to=ENGINE_TEMP_MAX, length=800, orient="horizontal")
     self.Temp.pack()
 
     # RPM

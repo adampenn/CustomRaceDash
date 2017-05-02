@@ -124,7 +124,7 @@ def updateGauges(app, q):
         app.style.configure("fuel.Horizontal.TProgressbar", background='white',
                             forground='white', thickness=100)
         fuelBlink -= 1
-    elif int(data[3]) > FUEL_WARNING:
+    elif int(data[3]) < FUEL_WARNING:
       app.style.configure("fuel.Horizontal.TProgressbar", background='yellow',
                           forground='yellow', thickness=100)
     else:
