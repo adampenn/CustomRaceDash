@@ -83,15 +83,15 @@ def updateGauges(app, q):
     app.labelTemp["text"] = data[1] + "RPM"
     if int(data[1]) > RPM_RED_LINE:
       if rpmBlink % 2:
-        app.style.configure("rpm.Vertical.TProgressbar", background='red', forground='red', thickness=100)
+        app.style.configure("rpm.Horizontal.TProgressbar", background='red', forground='red', thickness=100)
         rpmBlink += 1
       else:
-        app.style.configure("rpm.Vertical.TProgressbar", background='white', forground='white', thickness=100)
+        app.style.configure("rpm.Horizontal.TProgressbar", background='white', forground='white', thickness=100)
         rpmBlink -= 1
     elif int(data[1]) > RPM_WARNING:
-      app.style.configure("rpm.Vertical.TProgressbar", background='yellow', forground='yellow', thickness=100)
+      app.style.configure("rpm.Horizontal.TProgressbar", background='yellow', forground='yellow', thickness=100)
     else:
-      app.style.configure("rpm.Vertical.TProgressbar", background='white', forground='white', thickness=100)
+      app.style.configure("rpm.Horizontal.TProgressbar", background='white', forground='white', thickness=100)
 
     app.Temp["value"] = float(data[2])
     app.labelTemp["text"] = "Engine Temp " + data[2] + "C"
@@ -142,11 +142,11 @@ class Dash(tk.Tk):
     # Init
     tk.Tk.__init__(self)
     self.style = ttk.Style()
-    self.geometry('800x480')
+    self.geometry(str(WIDTH)+'x'+str(HIGHT))
 
     # Set up Styles
     self.style.configure("BW.TLabel", foreground="black")
-    self.style.configure("rpm.Vertical.TProgressbar", background='white',
+    self.style.configure("rpm.Horizontal.TProgressbar", background='white',
                     forground='white', thickness=100)
     self.style.configure("fuel.Horizontal.TProgressbar", background='white',
                     forground='white', thickness=100)
@@ -163,18 +163,18 @@ class Dash(tk.Tk):
 
     # TEMP
     self.labelTemp = ttk.Label(screen1, text="Engine Temp C", style="BW.TLabel")
-    self.labelTemp.grid(row=0, column=1)
-    self.Temp = ttk.Progressbar(screen1, orient="horizontal", length=50,
+    self.labelTemp.grid(row=2, column=0)
+    self.Temp = ttk.Progressbar(screen1, orient="horizontal", length=WIDTH,
                                mode="determinate", value=0, maximum=250,
-                               style="engineTemp.Vertical.TProgressbar")
-    self.Temp.grid(row=1, column=1, sticky="N")
+                               style="engineTemp.Horizontal.TProgressbar")
+    self.Temp.grid(row=3, column=0, sticky="W")
 
     # RPM
     self.labelRPM = ttk.Label(screen1, text="RPM", style="BW.TLabel")
     self.labelRPM.grid(row=0, column=0)
-    self.RPM = ttk.Progressbar(screen1, orient="vertical", maximum=7000,
-                               length=400, mode="determinate", value=0,
-                               style="rpm.Vertical.TProgressbar")
+    self.RPM = ttk.Progressbar(screen1, orient="horizontal", maximum=7000,
+                               length=WIDTH, mode="determinate", value=0,
+                               style="rpm.Horizontal.TProgressbar")
     self.RPM.grid(row=1, column=0)
 
     # MPH
@@ -186,11 +186,11 @@ class Dash(tk.Tk):
 
     # Fuel Level
     self.labelFuelLevel = ttk.Label(screen1, text="Fuel Level", style="BW.TLabel")
-    self.labelFuelLevel.grid(row=0, column=2)
-    self.fuelLevel = ttk.Progressbar(screen1, orient="horizontal", length=300,
+    self.labelFuelLevel.grid(row=4, column=0)
+    self.fuelLevel = ttk.Progressbar(screen1, orient="horizontal", length=WIDTH,
                                mode="determinate", value=0, maximum=100,
-                               style="fuel.Vertical.TProgressbar")
-    self.fuelLevel.grid(row=1, column=2, sticky="N")
+                               style="fuel.Horizontal.TProgressbar")
+    self.fuelLevel.grid(row=5, column=0, sticky="W")
 
     # Intake Temp
     self.labelIntakeTemp = ttk.Label(screen2, text="Intake Temp", style="BW.TLabel")

@@ -1,5 +1,9 @@
 #!/usr/bin/python3
 
+# Screen Size
+WIDTH = 800
+HIGHT = 480
+
 # RPM
 RPM_MAX = 9000
 RPM_RED_LINE = 8500
