@@ -6,6 +6,7 @@ import serial
 import time
 import obd
 import socket
+from dashSpecs import *
 import pickle
 from tkinter import ttk
 from queue import Queue
@@ -55,13 +56,13 @@ class Dash(tk.Tk):
     # TEMP
     self.labelTemp = ttk.Label(screen1, text="Engine Temp C", style="BW.TLabel")
     self.labelTemp.pack()
-    self.Temp = ttk.Scale(screen1, from_=0, to=250, length=800, orient="horizontal")
+    self.Temp = ttk.Scale(screen1, from_=0, to=FUEL_MAX, length=800, orient="horizontal")
     self.Temp.pack()
 
     # RPM
     self.labelRPM = ttk.Label(screen1, text="RPM", style="BW.TLabel")
     self.labelRPM.pack()
-    self.RPM = ttk.Scale(screen1, from_=0, to=8000, length=800, orient="horizontal")
+    self.RPM = ttk.Scale(screen1, from_=0, to=RPM_MAX, length=800, orient="horizontal")
     self.RPM.pack()
 
     # MPH
@@ -73,7 +74,7 @@ class Dash(tk.Tk):
     # Fuel Level
     self.labelFuelLevel = ttk.Label(screen1, text="Fuel Level", style="BW.TLabel")
     self.labelFuelLevel.pack()
-    self.fuelLevel = ttk.Scale(screen1, from_=0, to=100, length=800, orient="horizontal")
+    self.fuelLevel = ttk.Scale(screen1, from_=0, to=FUEL_MAX, length=800, orient="horizontal")
     self.fuelLevel.pack()
 
     # Intake Temp

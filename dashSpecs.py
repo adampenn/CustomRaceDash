@@ -8,7 +8,9 @@ RPM_WARNING = 7000
 # Fuel
 FUEL_WARNING = 15 # this is a percent
 FUEL_CRITICAL = 5 # this is a percent
+FUEL_MAX = 100
 
 # Engine Temp
 ENGINE_TEMP_WARNING = 250
 ENGINE_TEMP_CRITICAL = 300
+ENGINE_TEMP_MAX = 350
