@@ -25,7 +25,7 @@ def getData(app, q):
   s = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
   s.connect((serverMACAddress,port))
   while True:
-    time.sleep(1)
+    time.sleep(.1)
     data = [
       int(app.MPH.get()),        #data[0]
       int(app.RPM.get()),        #data[1]

@@ -173,7 +173,7 @@ class Dash(tk.Tk):
     self.labelRPM = ttk.Label(screen1, text="RPM", style="BW.TLabel")
     self.labelRPM.grid(row=0, column=0)
     self.RPM = ttk.Progressbar(screen1, orient="vertical", maximum=7000,
-                               length=800, mode="determinate", value=0,
+                               length=700, mode="determinate", value=0,
                                style="rpm.Vertical.TProgressbar")
     self.RPM.grid(row=1, column=0)
 
