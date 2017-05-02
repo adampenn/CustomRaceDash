@@ -141,16 +141,16 @@ class Dash(tk.Tk):
   def __init__(self):
     # Init
     tk.Tk.__init__(self)
-    style = ttk.Style()
+    self.style = ttk.Style()
     self.geometry('800x480')
 
     # Set up Styles
-    style.configure("BW.TLabel", foreground="black")
-    style.configure("rpm.Vertical.TProgressbar", background='white',
+    self.style.configure("BW.TLabel", foreground="black")
+    self.style.configure("rpm.Vertical.TProgressbar", background='white',
                     forground='white', thickness=100)
-    style.configure("fuel.Horizontal.TProgressbar", background='white',
+    self.style.configure("fuel.Horizontal.TProgressbar", background='white',
                     forground='white', thickness=100)
-    style.configure("engineTemp.Horizontal.TProgressbar", background='white',
+    self.style.configure("engineTemp.Horizontal.TProgressbar", background='white',
                     forground='white', thickness=100)
 
     # Set up the different screens
