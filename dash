@@ -7,6 +7,7 @@ import socket
 import time
 import obd
 from tkinter import ttk
+from dashSpecs import *
 from queue import Queue
 from threading import Thread
 
@@ -70,25 +71,66 @@ def readData(app, q):
 # Update Gauge Values
 def updateGauges(app, q):
   print("*** Update thread running")
+  rpmBlink = 0
+  fuelBlink = 0
   while True:
-    time.sleep(.05)
     data = q.get()
 
     app.MPH["value"] = float(data[0])
     app.labelMPH["text"] = data[0] + " MPH"
-
+  
     app.RPM["value"] = float(data[1])
     app.labelTemp["text"] = data[1] + "RPM"
-    if int(data[1]) > 5500:
-      app.RPM["style"] = "RPMhigh"
+    if int(data[1]) > RPM_RED_LINE:
+      if rpmBlink % 2:
+        app.style.configure("rpm.Vertical.TProgressbar", background='red', forground='red', thickness=100)
+        rpmBlink += 1
+      else:
+        app.style.configure("rpm.Vertical.TProgressbar", background='white', forground='white', thickness=100)
+        rpmBlink -= 1
+    elif int(data[1]) > RPM_WARNING:
+      app.style.configure("rpm.Vertical.TProgressbar", background='yellow', forground='yellow', thickness=100)
     else:
-      app.RPM["style"] = "RPMreg"
+      app.style.configure("rpm.Vertical.TProgressbar", background='white', forground='white', thickness=100)
 
     app.Temp["value"] = float(data[2])
     app.labelTemp["text"] = "Engine Temp " + data[2] + "C"
+    if int(data[2]) > ENGINE_TEMP_CRITICAL:
+      if fuelBlink % 2:
+        app.style.configure("engineTemp.Horizontal.TProgressbar", background='red',
+                            forground='red', thickness=100)
+        fuelBlink += 1
+      else:
+        app.style.configure("engineTemp.Horizontal.TProgressbar", background='white',
+                            forground='white', thickness=100)
+        fuelBlink -= 1
+    elif int(data[2]) > ENGINE_TEMP_WARNING:
+      app.style.configure("engineTemp.Horizontal.TProgressbar", background='yellow',
+                          forground='yellow', thickness=100)
+    else:
+      app.style.configure("engineTemp.Horizontal.TProgressbar", background='white',
+                          forground='white', thickness=100)
+
+
 
     app.fuelLevel["value"] = float(data[3])
     app.labelFuelLevel["text"] = "Fuel Level " + data[3] + "%"
+    if int(data[3]) <= FUEL_CRITICAL:
+      if fuelBlink % 2:
+        app.style.configure("fuel.Horizontal.TProgressbar", background='red',
+                            forground='red', thickness=100)
+        fuelBlink += 1
+      else:
+        app.style.configure("fuel.Horizontal.TProgressbar", background='white',
+                            forground='white', thickness=100)
+        fuelBlink -= 1
+    elif int(data[3]) > FUEL_WARNING:
+      app.style.configure("fuel.Horizontal.TProgressbar", background='yellow',
+                          forground='yellow', thickness=100)
+    else:
+      app.style.configure("fuel.Horizontal.TProgressbar", background='white',
+                          forground='white', thickness=100)
+
 
     app.intakeTemp["value"] = float(data[4])
     app.labelIntakeTemp["text"] = "Intake Temp " + data[4] + "C"
@@ -100,11 +142,16 @@ class Dash(tk.Tk):
     # Init
     tk.Tk.__init__(self)
     style = ttk.Style()
-    #style.configure("RPMhigh", forground='red', thickness=100)
-    style.configure("TProgressbar", background='red', forground='red', thickness=100)
-    #style.configure("TProgressbar", forground='blue', thickness=100)
-    style.configure("BW.TLabel", foreground="black")
     self.geometry('800x480')
+
+    # Set up Styles
+    style.configure("BW.TLabel", foreground="black")
+    style.configure("rpm.Vertical.TProgressbar", background='white',
+                    forground='white', thickness=100)
+    style.configure("fuel.Horizontal.TProgressbar", background='white',
+                    forground='white', thickness=100)
+    style.configure("engineTemp.Horizontal.TProgressbar", background='white',
+                    forground='white', thickness=100)
 
     # Set up the different screens
     notebook = ttk.Notebook(self)
@@ -116,39 +163,41 @@ class Dash(tk.Tk):
 
     # TEMP
     self.labelTemp = ttk.Label(screen1, text="Engine Temp C", style="BW.TLabel")
-    self.labelTemp.pack()
-    self.Temp = ttk.Progressbar(screen1, orient="horizontal", length=800,
-                               mode="determinate", value=0, maximum=250)
-    self.Temp.pack()
+    self.labelTemp.grid(row=0, column=1)
+    self.Temp = ttk.Progressbar(screen1, orient="horizontal", length=50,
+                               mode="determinate", value=0, maximum=250,
+                               style="engineTemp.Vertical.TProgressbar")
+    self.Temp.grid(row=1, column=1, sticky="N")
 
     # RPM
     self.labelRPM = ttk.Label(screen1, text="RPM", style="BW.TLabel")
-    self.labelRPM.pack()
-    self.RPM = ttk.Progressbar(screen1, orient="vertical", style="TProgressbar",
+    self.labelRPM.grid(row=0, column=0)
+    self.RPM = ttk.Progressbar(screen1, orient="vertical", maximum=7000,
                                length=800, mode="determinate", value=0,
-			       maximum=7000)
-    self.RPM.pack()
+                               style="rpm.Vertical.TProgressbar")
+    self.RPM.grid(row=1, column=0)
 
     # MPH
     self.labelMPH = ttk.Label(screen2, text="MPH", style="BW.TLabel")
-    self.labelMPH.pack()
-    self.MPH = ttk.Progressbar(screen2, orient="horizontal", length=800,
+    self.labelMPH.grid(row=0, column=0)
+    self.MPH = ttk.Progressbar(screen2, orient="horizontal", length=400,
                                mode="determinate", value=0, maximum=120)
-    self.MPH.pack()
+    self.MPH.grid(row=1, column=0)
 
     # Fuel Level
-    self.labelFuelLevel = ttk.Label(screen2, text="Fuel Level", style="BW.TLabel")
-    self.labelFuelLevel.pack()
-    self.fuelLevel = ttk.Progressbar(screen2, orient="horizontal", length=800,
-                               mode="determinate", value=0, maximum=100)
-    self.fuelLevel.pack()
+    self.labelFuelLevel = ttk.Label(screen1, text="Fuel Level", style="BW.TLabel")
+    self.labelFuelLevel.grid(row=0, column=2)
+    self.fuelLevel = ttk.Progressbar(screen1, orient="horizontal", length=300,
+                               mode="determinate", value=0, maximum=100,
+                               style="fuel.Vertical.TProgressbar")
+    self.fuelLevel.grid(row=1, column=2, sticky="N")
 
     # Intake Temp
     self.labelIntakeTemp = ttk.Label(screen2, text="Intake Temp", style="BW.TLabel")
-    self.labelIntakeTemp.pack()
-    self.intakeTemp = ttk.Progressbar(screen2, orient="horizontal", length=800,
+    self.labelIntakeTemp.grid(row=0, column=3)
+    self.intakeTemp = ttk.Progressbar(screen2, orient="horizontal", length=400,
                                mode="determinate", value=0, maximum=200)
-    self.intakeTemp.pack()
+    self.intakeTemp.grid(row=1, column=3)
 
 
 print('*** Main thread running')
