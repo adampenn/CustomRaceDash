@@ -172,7 +172,7 @@ class Dash(tk.Tk):
     # RPM
     self.labelRPM = ttk.Label(screen1, text="RPM", style="BW.TLabel")
     self.labelRPM.grid(row=0, column=0)
-    self.RPM = ttk.Progressbar(screen1, orient="horizontal", maximum=7000,
+    self.RPM = ttk.Progressbar(screen1, orient="horizontal", maximum=RPM_MAX,
                                length=WIDTH, mode="determinate", value=0,
                                style="rpm.Horizontal.TProgressbar")
     self.RPM.grid(row=1, column=0)
@@ -180,7 +180,7 @@ class Dash(tk.Tk):
     # MPH
     self.labelMPH = ttk.Label(screen2, text="MPH", style="BW.TLabel")
     self.labelMPH.grid(row=0, column=0)
-    self.MPH = ttk.Progressbar(screen2, orient="horizontal", length=400,
+    self.MPH = ttk.Progressbar(screen2, orient="horizontal", length=WIDTH,
                                mode="determinate", value=0, maximum=120)
     self.MPH.grid(row=1, column=0)
 
