@@ -75,44 +75,54 @@ def updateGauges(app, q):
   fuelBlink = 0
   while True:
     data = q.get()
-
+    
+    # SET MPH
     app.MPH["value"] = float(data[0])
     app.labelMPH["text"] = data[0] + " MPH"
-  
+
+    # SET RPM
     app.RPM["value"] = float(data[1])
     app.labelTemp["text"] = data[1] + "RPM"
     if int(data[1]) > RPM_RED_LINE:
       if rpmBlink % 2:
-        app.style.configure("rpm.Horizontal.TProgressbar", background='red', forground='red', thickness=100)
+        app.style.configure("rpm.Horizontal.TProgressbar", background=RPM_RED_LINE_COLOR1,
+                            forground=RPM_RED_LINE_COLOR1, thickness=100)
         rpmBlink += 1
       else:
-        app.style.configure("rpm.Horizontal.TProgressbar", background='white', forground='white', thickness=100)
+        app.style.configure("rpm.Horizontal.TProgressbar", background=RPM_RED_LINE_COLOR2,
+                            forground=RPM_RED_LINE_COLOR2, thickness=100)
         rpmBlink -= 1
     elif int(data[1]) > RPM_WARNING:
-      app.style.configure("rpm.Horizontal.TProgressbar", background='yellow', forground='yellow', thickness=100)
+      app.style.configure("rpm.Horizontal.TProgressbar", background=RPM_WARNING_COLOR,
+                          forground=RPM_WARNING_COLOR, thickness=100)
     else:
-      app.style.configure("rpm.Horizontal.TProgressbar", background='white', forground='white', thickness=100)
-
+      app.style.configure("rpm.Horizontal.TProgressbar", background=RPM_COLOR,
+                          forground=RPM_COLOR, thickness=100)
+    
+    # SET ENGINE TEMP
     app.Temp["value"] = float(data[2])
     app.labelTemp["text"] = "Engine Temp " + data[2] + "C"
     if int(data[2]) > ENGINE_TEMP_CRITICAL:
       if fuelBlink % 2:
-        app.style.configure("engineTemp.Horizontal.TProgressbar", background='red',
-                            forground='red', thickness=100)
+        app.style.configure("engineTemp.Horizontal.TProgressbar", 
+                            background=ENGINE_TEMP_CRITICAL_COLOR1,
+                            forground=ENGINE_TEMP_CRITICAL_COLOR1, thickness=100)
         fuelBlink += 1
       else:
-        app.style.configure("engineTemp.Horizontal.TProgressbar", background='white',
-                            forground='white', thickness=100)
+        app.style.configure("engineTemp.Horizontal.TProgressbar",
+                            background=ENGINE_TEMP_CRITICAL_COLOR2,
+                            forground=ENGINE_TEMP_CRITICAL_COLOR2, thickness=100)
         fuelBlink -= 1
     elif int(data[2]) > ENGINE_TEMP_WARNING:
-      app.style.configure("engineTemp.Horizontal.TProgressbar", background='yellow',
-                          forground='yellow', thickness=100)
+      app.style.configure("engineTemp.Horizontal.TProgressbar",
+                          background=ENGINE_TEMP_WARNING_COLOR,
+                          forground=ENGINE_TEMP_WARNING_COLOR, thickness=100)
     else:
-      app.style.configure("engineTemp.Horizontal.TProgressbar", background='white',
-                          forground='white', thickness=100)
+      app.style.configure("engineTemp.Horizontal.TProgressbar", background=ENGINE_TEMP_COLOR,
+                          forground=ENGINE_TEMP_COLOR, thickness=100)
 
 
-
+    # SET FUEL LEVEL
     app.fuelLevel["value"] = float(data[3])
     app.labelFuelLevel["text"] = "Fuel Level " + data[3] + "%"
     if int(data[3]) <= FUEL_CRITICAL:
@@ -131,7 +141,7 @@ def updateGauges(app, q):
       app.style.configure("fuel.Horizontal.TProgressbar", background='white',
                           forground='white', thickness=100)
 
-
+    # SET INTAKE TEMP
     app.intakeTemp["value"] = float(data[4])
     app.labelIntakeTemp["text"] = "Intake Temp " + data[4] + "C"
 
